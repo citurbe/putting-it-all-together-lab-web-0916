@@ -21,21 +21,27 @@ export default class App extends React.Component {
      return this.props.store.getState().aiCards.reduce((prev, curr)=> {return prev + curr.value}, 0)
   }
 
-  calculateUserScore() {
+  calculateUserScore(e) {
     let userScore = this.props.store.getState().userCards.reduce((prev, curr)=> {return prev + curr.value}, 0)
-    if(userScore > 21){this.stay()}
+    if(userScore > 21){alert('you lose!')}
     return userScore > 21 ? 'BUST' : userScore
   }
 
   stay(e) {
-    e.preventDefault()
-    if(this.calculateUserScore() === 'BUST' || this.calculateAiScore() > this.calculateUserScore()){
-      alert('You lose!')
-    } else if(this.calculateAiScore() > 21){
+    if (e !== undefined)
+    {e.preventDefault()}
+    
+    if(this.calculateAiScore() > 21){
       alert('You win!')
+      return 0
+    }
+    else if(this.calculateUserScore() === 'BUST' || this.calculateAiScore() > this.calculateUserScore()){
+      alert('You lose!')
+      return 0
     }
     else {
       this.props.store.dispatch(hitAI(this.props.store.getState()))
+      this.stay()
     }
   }
 
@@ -45,7 +51,7 @@ export default class App extends React.Component {
     return(
       <div>
         <UserBlackjack userCards={userCards} score={this.calculateUserScore} hitMe={this.hitMe} stay={this.stay} />
-        <AIBlackjack aiCards={aiCards} />
+        <AIBlackjack aiCards={aiCards} score={this.calculateAiScore} />
       </div>
     )
   }
